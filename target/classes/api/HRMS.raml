@@ -1,0 +1,17 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/121f76ac-28c5-4983-9215-57d1f3178809/ # 
+title: HRMS Employee Profile
+mediaType:
+  - application/json
+protocols:
+  - HTTP
+"/Employee":
+  post:
+    body: 
+      example: "{\"employee\":{\"id\":\"A007\",\"first_name\":\"Jan\",\"last_name\":\"Doe\"}}"
+    responses:
+      "201":
+        body:
+          application/json:
+            example: Jan Doe employee profile is created in HRMS System
+            type: string

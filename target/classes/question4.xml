@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+       xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       <flow name="join_inputs" doc:id="c0ab6a13-8be9-4528-8d04-926804d948e0" >
+              <http:listener doc:name="Listener" doc:id="0fed5659-f2c7-4a70-a897-335b2a1c636a" config-ref="code-challenge-httpListenerConfig" path="/join_inputs"/>
+		<ee:transform doc:name="Transform Message" doc:id="8da8e7fd-4f42-4166-8aa5-3213b70a9ec2" >
+                     <ee:message >
+                     </ee:message>
+                     <ee:variables >
+				<ee:set-variable variableName="input1" ><![CDATA[%dw 2.0
+output application/json
+---
+{"employee":[{"id":"A007","first_name":"Jan","last_name":"Doe"},{"id":"A008","first_name":"Ron","last_name":"David"},{"id":"A009","first_name":"Jane","last_name":"Kane"},{"id":"A010","first_name": "Marsh","last_name":"Megan"},{"id":"A011","first_name":"Kelly","last_name":"Mitch"},{"id":"A012", "first_name":"Chris","last_name":"Vaste"}]}
+]]></ee:set-variable>
+				<ee:set-variable variableName="input2" ><![CDATA[%dw 2.0
+output application/json
+---
+{"scoreBoard":[{"id":"A007","subjects":["Maths","English","Arts","Drawings"],"score":[80,75,89,100]},{"id":"A008","subjects":["Maths","English","Arts","Drawings"],"score":[70,85,69,90]},{"id":" A021","subjects":["Maths","English","Arts","Drawings"],"score":[90,87,77,95]}]}]]></ee:set-variable>
+                     </ee:variables>
+              </ee:transform>
+              <ee:transform doc:name="Transform Message" doc:id="262b08cd-9c79-4af7-b981-d17b37feedd9" >
+                     <ee:message >
+                     </ee:message>
+                     <ee:variables >
+                           <ee:set-variable variableName="transformedInput2" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.input2."scoreBoard" map (value,index) -> {
+       "id":(value)."id",
+       "MarksBySubjectWise" : ((value."subjects" map '$':value."score"[$$]) reduce ((val, acc) -> acc ++ val))
+}]]></ee:set-variable>
+                           <ee:set-variable variableName="transformedInput1" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.input1.employee]]></ee:set-variable>
+                     </ee:variables>
+              </ee:transform>
+              <ee:transform doc:name="Transform Message" doc:id="50a3d480-05e7-47b3-850d-112e4c098e02" >
+                     <ee:message >
+                     </ee:message>
+                     <ee:variables >
+                           <ee:set-variable variableName="leftJoinInput1" ><![CDATA[%dw 2.0
+import * from dw::core::Arrays
+output application/json
+---
+{"certificate" : vars.transformedInput1 map (value,index) -> {
+       (value),
+       (((vars.transformedInput2 filter $."id" == (value."id"))) map ($ - "id"))
+}}]]></ee:set-variable>
+                     </ee:variables>
+              </ee:transform>
+              <logger level="INFO" doc:name="Logger" doc:id="ada03746-1a18-4f6a-8d6e-b250e0144fd6" message="#[vars.leftJoinInput1]"/>
+              <ee:transform doc:name="Transform Message" doc:id="4e2cee16-3ed9-4635-a0b2-0248b7b6397f" >
+                     <ee:message >
+                           <ee:set-payload ><![CDATA[%dw 2.0
+//import * from dw::core::Arrays
+output application/json
+---
+vars.leftJoinInput1."certificate" -- (vars.transformedInput1 filter ((value,index) -> !(vars.transformedInput2."id" contains value."id")))]]></ee:set-payload>
+                     </ee:message>
+              </ee:transform>
+              <logger level="INFO" doc:name="Logger" doc:id="6cc1eae6-d187-4c1b-8cd2-f3cd6a1741a4" message="#[payload]"/>
+       </flow>
+</mule>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	 <flow name="natural_number_dwFlow" doc:id="d4c26bdb-84dd-4e9c-851a-5d369f4845a1" >
+            <http:listener doc:name="Listener" doc:id="0a97a20c-235f-4af3-a9d7-73614a2082c0" config-ref="code-challenge-httpListenerConfig" path="/natural_number_dwFlow"/>
+            <ee:transform doc:name="Transform Message" doc:id="46be882c-5b99-4ae6-8b93-b870ed1219e6" >
+                  <ee:message >
+                  </ee:message>
+                  <ee:variables >
+                        <ee:set-variable variableName="range" ><![CDATA[attributes.uriParams.range as Number]]></ee:set-variable>
+                  </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="Transform Message" doc:id="c8422f37-6911-45f1-bb15-51605524cc29" >
+                  <ee:message >
+                        <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun prepareList(list:Array, maxSize: Number) = if(sizeOf(list) >= maxSize )
+list
+else
+prepareList(list ++ [(sizeOf(list) + 1) as Number],maxSize)
+---
+prepareList([],vars.range)]]></ee:set-payload>
+                  </ee:message>
+            </ee:transform>
+      </flow></mule>

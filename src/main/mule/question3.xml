@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+		<flow name="reusable_java_function" doc:id="4c2eb1d9-7dca-4f7b-a175-b95d631c9e5d" >
+		<http:listener doc:name="Listener" doc:id="f8469a7f-7e8d-46a0-ba2f-9a63328fbd46" path="/reusable_java_function" config-ref="code-challenge-httpListenerConfig"/>
+		<ee:transform doc:name="Transform Message" doc:id="1a220230-35b2-4da5-b78f-3a15013a314c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import java!com::util::CamelCaseConverter
+output application/java
+---
+CamelCaseConverter::convertStringIntoCamelCase(payload)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+ 
+</mule>

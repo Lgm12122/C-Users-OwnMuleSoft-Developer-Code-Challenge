@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+<flow name="triggers_first_flow_dw" doc:id="5f6f460a-8a84-4c74-9f53-40965501af6a" >
+		<http:listener doc:name="Listener" doc:id="abad8814-f308-4894-9dc1-49bc561a35fd" path="/triggers_first_flow_dw" config-ref="code-challenge-httpListenerConfig"/>
+		<ee:transform doc:name="Transform Message" doc:id="95370f99-44cf-42c2-a7e3-65527c63f883" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+Mule::lookup('post:\Employee:application\json:code-challenge-config', {"employee": { "id": "A007",  "first_name": "Jan", "last_name": "Doe"  }})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+ 
+ 
+</mule>
